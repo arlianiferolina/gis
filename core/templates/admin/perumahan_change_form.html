@@ -1,0 +1,262 @@
+{% extends 'admin/change_form.html' %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin-top: 20px;
+        }
+        .coordinates-info {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    
+    <div class="map-container">
+        <div class="coordinates-info">
+            Lokasi: <span id="location-coords">Belum dipilih</span> | 
+            Polygon: <span id="polygon-coords">Tidak ada</span>
+        </div>
+        <div id="map"></div>
+    </div>
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    {{ block.super }}
+    
+    <script>
+        // Initialize the map
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get existing values if they exist
+            var locationField = document.getElementById('id_location');
+            var polygonField = document.getElementById('id_polygon');
+            
+            var initialLocation = null;
+            var initialPolygon = null;
+            
+            if (locationField.value) {
+                try {
+                    initialLocation = JSON.parse(locationField.value);
+                } catch (e) {
+                    console.error('Error parsing location:', e);
+                }
+            }
+            
+            if (polygonField.value) {
+                try {
+                    initialPolygon = JSON.parse(polygonField.value);
+                } catch (e) {
+                    console.error('Error parsing polygon:', e);
+                }
+            }
+            
+            // Set initial map view (default to Kupang if no location)
+            var initialCenter = [-10.1772, 123.6070]; // Kota Kupang coordinates
+            var initialZoom = 13;
+            
+            if (initialLocation) {
+                initialCenter = [initialLocation.lat, initialLocation.lng];
+                initialZoom = 15;
+            }
+            
+            var map = L.map('map').setView(initialCenter, initialZoom);
+            
+            // Add OpenStreetMap tiles (default base layer)
+            var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            });
+            
+            // Add Satellite layer
+            var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
+            });
+            
+            // Add default layer to map
+            osmLayer.addTo(map);
+            
+            // Add layer control for base layers
+            var baseMaps = {
+                "OpenStreetMap": osmLayer,
+                "Satelit": satelliteLayer
+            };
+            
+            L.control.layers(baseMaps, null, {position: 'topright'}).addTo(map);
+            
+            // Create feature groups
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Initialize the draw control and pass it the FeatureGroup of editable layers
+            var drawControl = new L.Control.Draw({
+                position: 'topright',
+                draw: {
+                    polyline: false,
+                    polygon: {
+                        allowIntersection: false,
+                        drawError: {
+                            color: '#e1e100',
+                            message: '<strong>Error:</strong> polygon edges cannot intersect!'
+                        },
+                        shapeOptions: {
+                            color: '#97009c'
+                        }
+                    },
+                    rectangle: false,
+                    circle: false,
+                    circlemarker: false,
+                    marker: true
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true
+                }
+            });
+            map.addControl(drawControl);
+            
+            // Update coordinate display
+            function updateLocationDisplay(lat, lng) {
+                document.getElementById('location-coords').textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+            }
+            
+            function updatePolygonDisplay(coords) {
+                if (coords && coords.length > 0) {
+                    document.getElementById('polygon-coords').textContent = 'Ada (' + coords[0].length + ' titik)';
+                } else {
+                    document.getElementById('polygon-coords').textContent = 'Tidak ada';
+                }
+            }
+            
+            // Handle marker creation
+            map.on(L.Draw.Event.CREATED, function (e) {
+                var type = e.layerType,
+                    layer = e.layer;
+                
+                if (type === 'marker') {
+                    // Remove existing markers
+                    drawnItems.eachLayer(function (layer) {
+                        if (layer instanceof L.Marker) {
+                            drawnItems.removeLayer(layer);
+                        }
+                    });
+                    
+                    // Add new marker
+                    drawnItems.addLayer(layer);
+                    
+                    // Update location field
+                    var latLng = layer.getLatLng();
+                    var locationData = {
+                        'lat': latLng.lat,
+                        'lng': latLng.lng
+                    };
+                    locationField.value = JSON.stringify(locationData);
+                    updateLocationDisplay(latLng.lat, latLng.lng);
+                }
+                else if (type === 'polygon') {
+                    // Remove existing polygons
+                    drawnItems.eachLayer(function (layer) {
+                        if (layer instanceof L.Polygon) {
+                            drawnItems.removeLayer(layer);
+                        }
+                    });
+                    
+                    // Add new polygon
+                    drawnItems.addLayer(layer);
+                    
+                    // Update polygon field
+                    var coordinates = layer.getLatLngs()[0];
+                    var geoJsonCoords = [];
+                    for (var i = 0; i < coordinates.length; i++) {
+                        geoJsonCoords.push([coordinates[i].lng, coordinates[i].lat]);
+                    }
+                    // Close the polygon by duplicating the first coordinate
+                    if (geoJsonCoords.length > 0) {
+                        geoJsonCoords.push(geoJsonCoords[0]);
+                    }
+                    
+                    var polygonData = {
+                        'type': 'Polygon',
+                        'coordinates': [geoJsonCoords]
+                    };
+                    polygonField.value = JSON.stringify(polygonData);
+                    updatePolygonDisplay(geoJsonCoords);
+                }
+            });
+            
+            // Handle edits
+            map.on(L.Draw.Event.EDITED, function (e) {
+                var layers = e.layers;
+                layers.eachLayer(function (layer) {
+                    if (layer instanceof L.Marker) {
+                        var latLng = layer.getLatLng();
+                        var locationData = {
+                            'lat': latLng.lat,
+                            'lng': latLng.lng
+                        };
+                        locationField.value = JSON.stringify(locationData);
+                        updateLocationDisplay(latLng.lat, latLng.lng);
+                    }
+                    else if (layer instanceof L.Polygon) {
+                        var coordinates = layer.getLatLngs()[0];
+                        var geoJsonCoords = [];
+                        for (var i = 0; i < coordinates.length; i++) {
+                            geoJsonCoords.push([coordinates[i].lng, coordinates[i].lat]);
+                        }
+                        // Close the polygon by duplicating the first coordinate
+                        if (geoJsonCoords.length > 0) {
+                            geoJsonCoords.push(geoJsonCoords[0]);
+                        }
+                        
+                        var polygonData = {
+                            'type': 'Polygon',
+                            'coordinates': [geoJsonCoords]
+                        };
+                        polygonField.value = JSON.stringify(polygonData);
+                        updatePolygonDisplay(geoJsonCoords);
+                    }
+                });
+            });
+            
+            // Handle deletes
+            map.on(L.Draw.Event.DELETED, function (e) {
+                var layers = e.layers;
+                layers.eachLayer(function (layer) {
+                    if (layer instanceof L.Marker) {
+                        locationField.value = '';
+                        document.getElementById('location-coords').textContent = 'Belum dipilih';
+                    }
+                    else if (layer instanceof L.Polygon) {
+                        polygonField.value = '';
+                        document.getElementById('polygon-coords').textContent = 'Tidak ada';
+                    }
+                });
+            });
+            
+            // Load existing data
+            if (initialLocation) {
+                var marker = L.marker([initialLocation.lat, initialLocation.lng]).addTo(drawnItems);
+                updateLocationDisplay(initialLocation.lat, initialLocation.lng);
+            }
+            
+            if (initialPolygon) {
+                var polygonCoords = initialPolygon.coordinates[0];
+                var latLngs = [];
+                for (var i = 0; i < polygonCoords.length; i++) {
+                    latLngs.push([polygonCoords[i][1], polygonCoords[i][0]]);
+                }
+                var polygon = L.polygon(latLngs, {color: '#97009c'}).addTo(drawnItems);
+                updatePolygonDisplay(polygonCoords);
+            }
+        });
+    </script>
+{% endblock %}

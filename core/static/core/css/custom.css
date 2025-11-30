@@ -1,0 +1,145 @@
+/* Custom CSS for WebGIS Perumahan */
+
+/* Body padding to account for fixed navbar and marquee */
+body {
+    padding-top: 80px; /* Adjust based on marquee + navbar height */
+}
+
+/* Marquee Advertisement */
+.marquee-container {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1050; /* Above navbar */
+}
+
+.marquee-text {
+    font-weight: bold;
+    font-size: 1rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.marquee-text i {
+    margin: 0 5px;
+    color: #ffeb3b; /* Yellow color for icons */
+}
+
+/* Hero section styling */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), 
+                url('/static/core/images/hero-bg.jpg') center/cover no-repeat;
+}
+
+/* Map container styling */
+#map {
+    height: 70vh;
+    width: 100%;
+    min-height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Info card styling */
+.info-card {
+    max-width: 300px;
+}
+
+/* Photo thumbnail styling */
+.photo-thumb {
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Filter section styling */
+.filter-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Facility list styling */
+.facility-list {
+    padding-left: 20px;
+}
+
+.facility-list li {
+    margin-bottom: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #map {
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .filter-section .row > div {
+        margin-bottom: 10px;
+    }
+    
+    /* Adjust body padding for mobile */
+    body {
+        padding-top: 70px;
+    }
+    
+    /* Smaller marquee text on mobile */
+    .marquee-text {
+        font-size: 0.85rem;
+    }
+}
+
+/* Status badges */
+.status-available {
+    background-color: #28a745 !important;
+}
+
+.status-sold {
+    background-color: #dc3545 !important;
+}
+
+/* Price styling */
+.price-tag {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Custom marker icon */
+.house-marker {
+    background: transparent;
+    border: none;
+}
+
+/* Polygon styling */
+.perumahan-polygon {
+    fill-opacity: 0.3;
+    stroke-width: 2;
+}
+
+/* Vibrant success button for map popups */
+.btn-success {
+    background-color: #20c997 !important; /* More vibrant green */
+    border-color: #20c997 !important;
+}
+
+.btn-success:hover {
+    background-color: #1aa179 !important; /* Darker on hover */
+    border-color: #1aa179 !important;
+}
+
+/* Icon-only buttons in map popups */
+.map-popup .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.map-popup .btn i {
+    font-size: 1.2rem;
+}

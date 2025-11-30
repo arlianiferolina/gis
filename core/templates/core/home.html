@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Beranda - WebGIS Perumahan{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold">WebGIS Perumahan Sejahtera Group</h1>
+                <p class="lead">Temukan perumahan impian Anda di Kota Kupang dengan mudah dan cepat</p>
+                <a href="{% url 'core:perumahan_list' %}" class="btn btn-light btn-lg mt-3">Lihat Perumahan</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">Tentang Sejahtera Group</h2>
+                <p class="lead">
+                    Sejahtera Group adalah pengembang perumahan terkemuka di Kota Kupang yang berkomitmen 
+                    untuk menciptakan hunian berkualitas dengan lingkungan yang nyaman dan aman bagi keluarga.
+                </p>
+                <p>
+                    Dengan pengalaman lebih dari 10 tahun dalam industri properti, kami telah mengembangkan 
+                    berbagai perumahan strategis yang dilengkapi dengan fasilitas lengkap dan infrastruktur 
+                    terbaik untuk mendukung kenyamanan hidup Anda.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="mb-4">Kenapa Memilih Kami?</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Lokasi Strategis</h5>
+                        <p class="card-text">Perumahan kami berada di lokasi yang mudah dijangkau dengan akses transportasi yang baik.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Fasilitas Lengkap</h5>
+                        <p class="card-text">Setiap perumahan dilengkapi dengan fasilitas umum seperti taman, security 24 jam, dan area anak-anak.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Harga Terjangkau</h5>
+                        <p class="card-text">Kami menawarkan berbagai pilihan tipe rumah dengan harga yang kompetitif dan cicilan ringan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">Hubungi Kami</h2>
+                <p class="lead">
+                    Punya pertanyaan atau ingin berkonsultasi langsung? Jangan ragu untuk menghubungi kami!
+                </p>
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Alamat</h5>
+                                <p class="card-text">Jl. Sejahtera No. 123, Kota Kupang</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Telepon</h5>
+                                <p class="card-text">(0380) 123456</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Email</h5>
+                                <p class="card-text">info@sejahteragroup.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
